@@ -1,4 +1,6 @@
-﻿using FailApp.Models;
+﻿using FailApp.Entities;
+using FailApp.Models;
+using FailApp.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -11,34 +13,68 @@ namespace FailApp.Controllers
 {
     public class StockController : Controller
     {
+        private StockRepository StockService;
+        private ItemRepository itemRepository;
         private readonly ILogger<StockController> _logger;
 
-        public StockController(ILogger<StockController> logger)
+        public StockController(
+            ILogger<StockController> logger, 
+            StockRepository StockService,
+            ItemRepository itemRepository)
         {
             _logger = logger;
+            this.StockService = StockService;
+            this.itemRepository = itemRepository;
         }
 
         public IActionResult Index()
         {
-            return View();
+            return View(StockService.Get());
         }
 
         public IActionResult Create()
         {
+            ViewData["data"] = itemRepository.Get();
             return View();
         }
-        public IActionResult Edit()
+
+        [HttpPost]
+        public IActionResult Create(Stock data)
         {
-            return View();
+            StockService.Save(data);
+            return RedirectToAction("Index");
         }
-        public IActionResult Details()
+
+        public IActionResult Edit(int id)
         {
-            return View();
+            return View(StockService.Get(id));
         }
-        public IActionResult Delete()
+
+        [HttpPost]
+        public IActionResult Edit(Stock data)
         {
-            return View();
+            StockService.Update(data);
+            return RedirectToAction("Index");
         }
+
+        public IActionResult Details(int id)
+        {
+            var x = StockService.Get(id);
+            return View(StockService.Get(id));
+        }
+
+        public IActionResult Delete(int id)
+        {
+            return View(StockService.Get(id));
+        }
+
+        [HttpPost]
+        public IActionResult Delete(Stock Stock)
+        {
+            StockService.Delete(Stock.Id);
+            return RedirectToAction("Index");
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

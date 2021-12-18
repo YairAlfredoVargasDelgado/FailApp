@@ -9,30 +9,35 @@ using System.Threading.Tasks;
 
 namespace FailApp.Services
 {
-    public abstract class CRUDService<TKey, TEntity> where TEntity : Entity<TKey>
+    public abstract class Repository<TKey, TEntity> where TEntity : Entity<TKey>
     {
-        private Context context;
-        private string name = typeof(TEntity).Name;
-        private string[] attributes = typeof(TEntity).GetProperties().Select(prop => prop.Name).ToArray();
+        protected Context context;
+        protected string name = typeof(TEntity).Name;
+        protected List<string> exclude = new List<string>();
+        protected string[] attributes = typeof(TEntity).GetProperties()
+            .Where(prop => !Attribute.IsDefined(prop, typeof(Ignore)))
+            .Select(prop => prop.Name)
+            .ToArray();
 
-        public CRUDService(Context context)
+        public Repository(Context context)
         {
             this.context = context;
         }
 
-        public string[] Values(object src)
+        public virtual string[] Values(object src)
         {
             List<string> values = new List<string>();
             foreach(var attr in attributes)
             {
-                values.Add(typeof(TEntity).GetProperty(attr).GetValue(src, null).ToString());
+                if (attr != "Id")
+                    values.Add(typeof(TEntity).GetProperty(attr).GetValue(src, null).ToString());
             }
-            return values.ToArray();
+            return values.Select(v => v.GetType() == typeof(string) ? $"'{v}'" : v).ToArray();
         }
 
         public abstract TEntity Map(SqlDataReader sqlDataReader);
 
-        public IEnumerable<TEntity> Get()
+        public virtual IEnumerable<TEntity> Get()
         {
             string query = @$"SELECT {string.Join(",", attributes)} FROM {name}";
             List<TEntity> entities = new List<TEntity>();
@@ -48,7 +53,7 @@ namespace FailApp.Services
             return entities;
         }
 
-        public TEntity Get(TKey key)
+        public virtual TEntity Get(TKey key)
         {
             string query = @$"SELECT {string.Join(",", attributes)} FROM {name} WHERE Id = {key}";
             using SqlConnection conn = context.GetConnection();
@@ -59,9 +64,9 @@ namespace FailApp.Services
             return Map(sqlDataReader);
         }
 
-        public void Save(TEntity entity)
+        public virtual void Save(TEntity entity)
         {
-            string query = @$"INSERT INTO {name} ({string.Join(",", attributes)}) VALUES({string.Join(",", Values(entity))})";
+            string query = @$"INSERT INTO {name} ({string.Join(",", attributes.ToList().Where(att => att != "Id").ToArray())}) VALUES({string.Join(",", Values(entity))})";
             using SqlConnection conn = context.GetConnection();
             conn.Open();
             using SqlCommand command = new SqlCommand(query, conn);
@@ -69,7 +74,7 @@ namespace FailApp.Services
             conn.Close();
         }
 
-        public void Delete(TEntity e)
+        public virtual void Delete(TEntity e)
         {
             string query = @$"DELETE FROM {typeof(TEntity)} WHERE Id = {e.Id}";
             using SqlConnection conn = context.GetConnection();
@@ -79,7 +84,7 @@ namespace FailApp.Services
             conn.Close();
         }
 
-        public void Delete(TKey key)
+        public virtual void Delete(TKey key)
         {
             string query = @$"DELETE FROM {name} WHERE Id = {key}";
             using SqlConnection conn = context.GetConnection();
@@ -89,18 +94,19 @@ namespace FailApp.Services
             conn.Close();
         }
 
-        public void Update(TEntity e)
+        public virtual void Update(TEntity e)
         {
             var values = Values(e);
-            string s = attributes[0] + " = " + values[0] + ",";
-            for (int i = 1; i < attributes.Length; i++)
+            var _attrs = attributes.ToList().Where(v => v != "Id").ToArray();
+            string s = _attrs[0] + " = " + values[0];
+            for (int i = 1; i < _attrs.Length; i++)
             {
-                s += attributes[i] + " = " + values[i];
+                s += "," + _attrs[i] + " = " + values[i];
             }
             string query = @$"UPDATE {name} SET {s} WHERE Id = {e.Id}";
             using SqlConnection conn = context.GetConnection();
             conn.Open();
-            using SqlCommand command = new SqlCommand("", conn);
+            using SqlCommand command = new SqlCommand(query, conn);
             command.ExecuteNonQuery();
             conn.Close();
         }

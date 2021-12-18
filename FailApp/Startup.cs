@@ -1,3 +1,5 @@
+using FailApp.Data;
+using FailApp.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -24,6 +26,12 @@ namespace FailApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddSingleton<Context>();
+            services.AddTransient<ItemRepository>();
+            services.AddTransient<StockRepository>();
+            services.AddTransient<UserRepository>();
+            services.AddTransient<PrivilegeRepository>();
+            services.AddTransient<UserPrivilegeRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

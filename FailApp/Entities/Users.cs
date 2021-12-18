@@ -5,11 +5,13 @@ using System.Threading.Tasks;
 
 namespace FailApp.Entities
 {
-    public class User : Entity<long>
+    public class Users : Entity<long>
     {
         public string Name { get; set; }
         public string Password { get; set; }
+
+        [Ignore]
         public List<Privilege> Privileges { get; set; }
-        public User() { }
+        public Users() { }
     }
 }

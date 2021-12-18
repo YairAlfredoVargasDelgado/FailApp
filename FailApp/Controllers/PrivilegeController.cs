@@ -1,4 +1,6 @@
-﻿using FailApp.Models;
+﻿using FailApp.Entities;
+using FailApp.Models;
+using FailApp.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -11,34 +13,61 @@ namespace FailApp.Controllers
 {
     public class PrivilegeController : Controller
     {
+        private PrivilegeRepository PrivilegeService;
         private readonly ILogger<PrivilegeController> _logger;
 
-        public PrivilegeController(ILogger<PrivilegeController> logger)
+        public PrivilegeController(ILogger<PrivilegeController> logger, PrivilegeRepository PrivilegeService)
         {
             _logger = logger;
+            this.PrivilegeService = PrivilegeService;
         }
 
         public IActionResult Index()
         {
-            return View();
+            return View(PrivilegeService.Get());
         }
 
         public IActionResult Create()
         {
             return View();
         }
-        public IActionResult Edit()
+
+        [HttpPost]
+        public IActionResult Create(Privilege data)
         {
-            return View();
+            PrivilegeService.Save(data);
+            return RedirectToAction("Index");
         }
-        public IActionResult Details()
+
+        public IActionResult Edit(int id)
         {
-            return View();
+            return View(PrivilegeService.Get(id));
         }
-        public IActionResult Delete()
+
+        [HttpPost]
+        public IActionResult Edit(Privilege data)
         {
-            return View();
+            PrivilegeService.Update(data);
+            return RedirectToAction("Index");
         }
+
+        public IActionResult Details(int id)
+        {
+            return View(PrivilegeService.Get(id));
+        }
+
+        public IActionResult Delete(int id)
+        {
+            return View(PrivilegeService.Get(id));
+        }
+
+        [HttpPost]
+        public IActionResult Delete(Privilege Privilege)
+        {
+            PrivilegeService.Delete(Privilege.Id);
+            return RedirectToAction("Index");
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
