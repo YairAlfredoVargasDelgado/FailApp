@@ -7,6 +7,6 @@ namespace FailApp.Entities
 {
     public class Entity<TKey>
     {
-        public TKey Id { get; set; }
+        public virtual TKey Id { get; set; }
     }
 }
