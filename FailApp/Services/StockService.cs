@@ -1,6 +1,8 @@
-﻿using FailApp.Entities;
+﻿using FailApp.Data;
+using FailApp.Entities;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -8,32 +10,14 @@ namespace FailApp.Services
 {
     public class StockService : CRUDService<long, Stock>
     {
-        public void Delete(Stock e)
+        public StockService(Context context): base(context) { }
+
+        public override Stock Map(SqlDataReader sqlDataReader)
         {
             throw new NotImplementedException();
         }
 
-        public void Delete(long key)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<Stock> Get()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Stock Get(long key)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Save(Stock e)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update(Stock e)
+        public override string Values(Stock entity)
         {
             throw new NotImplementedException();
         }

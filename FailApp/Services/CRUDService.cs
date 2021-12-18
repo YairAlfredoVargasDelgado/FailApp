@@ -23,16 +23,6 @@ namespace FailApp.Services
         public abstract TEntity Map(SqlDataReader sqlDataReader);
         public abstract string Values(TEntity entity);
 
-        public string GetValues()
-        {
-            typeof(TEntity)
-              .GetProperty("Name")
-              .GetCustomAttributes(false)
-              .ToDictionary(a => a.GetType().Name, a => a);
-
-
-        }
-
         public IEnumerable<TEntity> Get()
         {
             string query = @$"SELECT {string.Join(",", attributes)} FROM {name}";
@@ -72,7 +62,12 @@ namespace FailApp.Services
 
         public void Delete(TEntity e)
         {
-
+            string query = @$"DELETE FROM {typeof(TEntity)} WHERE Id = {e.Id}";
+            using SqlConnection conn = context.GetConnection();
+            conn.Open();
+            using SqlCommand command = new SqlCommand(query, conn);
+            command.ExecuteNonQuery();
+            conn.Close();
         }
 
         public void Delete(TKey key)
@@ -87,17 +82,10 @@ namespace FailApp.Services
 
         public void Update(TEntity e)
         {
-            string _query = "";
-
-            foreach (var attr in attributes)
-            {
-                _query += $"{attr} = {typeof(TEntity).Pr}"
-            }
-
-            string query = @$"UPDATE {name} Name = {e.Name}, Description = {e.Description}, Price = {e.Price} WHERE Id = {e.Id}";
+            //string query = @$"UPDATE {name} Name = {e.Name}, Description = {e.Description}, Price = {e.Price} WHERE Id = {e.Id}";
             using SqlConnection conn = context.GetConnection();
             conn.Open();
-            using SqlCommand command = new SqlCommand(query, conn);
+            using SqlCommand command = new SqlCommand("", conn);
             command.ExecuteNonQuery();
             conn.Close();
         }
