@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace FailApp.Controllers
 {
-    public class HomeController : Controller
+    public class StockController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ILogger<StockController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        public StockController(ILogger<StockController> logger)
         {
             _logger = logger;
         }
@@ -23,16 +23,26 @@ namespace FailApp.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
+        public IActionResult Create()
         {
             return View();
         }
-
+        public IActionResult Edit()
+        {
+            return View();
+        }
+        public IActionResult Details()
+        {
+            return View();
+        }
+        public IActionResult Delete()
+        {
+            return View();
+        }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-
     }
 }
