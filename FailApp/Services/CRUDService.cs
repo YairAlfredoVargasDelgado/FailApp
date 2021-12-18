@@ -20,8 +20,17 @@ namespace FailApp.Services
             this.context = context;
         }
 
+        public string[] Values(object src)
+        {
+            List<string> values = new List<string>();
+            foreach(var attr in attributes)
+            {
+                values.Add(typeof(TEntity).GetProperty(attr).GetValue(src, null).ToString());
+            }
+            return values.ToArray();
+        }
+
         public abstract TEntity Map(SqlDataReader sqlDataReader);
-        public abstract string Values(TEntity entity);
 
         public IEnumerable<TEntity> Get()
         {
@@ -52,7 +61,7 @@ namespace FailApp.Services
 
         public void Save(TEntity entity)
         {
-            string query = @$"INSERT INTO {name} ({string.Join(",", attributes)}) VALUES({Values(entity)})";
+            string query = @$"INSERT INTO {name} ({string.Join(",", attributes)}) VALUES({string.Join(",", Values(entity))})";
             using SqlConnection conn = context.GetConnection();
             conn.Open();
             using SqlCommand command = new SqlCommand(query, conn);
@@ -82,7 +91,13 @@ namespace FailApp.Services
 
         public void Update(TEntity e)
         {
-            //string query = @$"UPDATE {name} Name = {e.Name}, Description = {e.Description}, Price = {e.Price} WHERE Id = {e.Id}";
+            var values = Values(e);
+            string s = attributes[0] + " = " + values[0] + ",";
+            for (int i = 1; i < attributes.Length; i++)
+            {
+                s += attributes[i] + " = " + values[i];
+            }
+            string query = @$"UPDATE {name} SET {s} WHERE Id = {e.Id}";
             using SqlConnection conn = context.GetConnection();
             conn.Open();
             using SqlCommand command = new SqlCommand("", conn);

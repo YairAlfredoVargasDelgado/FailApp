@@ -7,6 +7,7 @@ namespace FailApp.Entities
 {
     public class Stock : Entity<long>
     {
+        public long ItemId { get; set; }
         public Item Item { get; set; }
         public decimal Quantity { get; set; }
         public Stock() { }

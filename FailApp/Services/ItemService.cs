@@ -18,12 +18,13 @@ namespace FailApp.Services
 
         public override Item Map(SqlDataReader sqlDataReader)
         {
-            throw new NotImplementedException();
-        }
-
-        public override string Values(Item entity)
-        {
-            throw new NotImplementedException();
+            return new Item()
+            {
+                Id = sqlDataReader.GetInt32(0),
+                Name = sqlDataReader.GetString(1),
+                Price = sqlDataReader.GetDecimal(2),
+                Description = sqlDataReader.GetString(3),
+            };
         }
     }
 }

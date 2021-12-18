@@ -14,12 +14,12 @@ namespace FailApp.Services
 
         public override Stock Map(SqlDataReader sqlDataReader)
         {
-            throw new NotImplementedException();
-        }
-
-        public override string Values(Stock entity)
-        {
-            throw new NotImplementedException();
+            return new Stock()
+            {
+                Id = sqlDataReader.GetInt32(0),
+                ItemId = sqlDataReader.GetInt32(1),
+                Quantity = sqlDataReader.GetDecimal(2)
+            };
         }
     }
 }
