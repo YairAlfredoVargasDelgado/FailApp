@@ -12,7 +12,9 @@ namespace FailApp.Data
         {
             SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
 
-            builder.DataSource = "(localdb)\\MSSQLLocalDB";
+            //builder.DataSource = "(localdb)\\MSSQLLocalDB"; //Sesión Yair
+            builder.DataSource = "DESKTOP-BEMUAFC\\SQLEXPRESS"; //Sesión Iván
+            builder.IntegratedSecurity = true;
             //builder.UserID = "<your_username>";
             //builder.Password = "<your_password>";
             builder.InitialCatalog = "FailAppDB";
